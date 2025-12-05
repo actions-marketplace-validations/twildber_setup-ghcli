@@ -100,5 +100,5 @@ export async function setup() {
   const versionSpec = await getValidTag(version);
 
   await downloadCli(versionSpec, os.arch());
-  core.setOutput("gh_version", version);
+  core.setOutput("gh_version", versionSpec);
 }

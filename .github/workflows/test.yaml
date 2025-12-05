@@ -19,18 +19,44 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install packages
         run: npm ci
+
+      - name: Run tests
+        run: npm run test
 
       - name: Build package
         run: npm run build
 
       - name: Test installing gh cli
-        run: node .
-        env:
-          version: 2.28.0
+        id: install
+        uses: ./
+        with:
+          version: 2.34.0
 
-      - name: Test gh command works
-        run: gh --version
+      - name: Test gh command works on ubuntu
+        if: matrix.os == 'ubuntu-latest'
+        env:
+          INSTALL_OUTPUT: ${{ steps.install.outputs.gh_version }}
+        run: |
+          echo "Installed gh version: $INSTALL_OUTPUT"
+          $RUNNER_TOOL_CACHE/gh/2.34.0/x64/bin/gh --version
+
+      - name: Test gh command works on macos
+        if: matrix.os  == 'macos-latest'
+        env:
+          INSTALL_OUTPUT: ${{ steps.install.outputs.gh_version }}
+        run: |
+          echo "Installed gh version: $INSTALL_OUTPUT"
+          $RUNNER_TOOL_CACHE/gh/2.34.0/arm64/gh_2.34.0_macOS_arm64/bin/gh --version
+
+      - name: Test gh command works on windows
+        if: matrix.os == 'windows-latest'
+        shell: cmd
+        env:
+          INSTALL_OUTPUT: ${{ steps.install.outputs.gh_version }}
+        run: |
+          echo "Installed gh version: %INSTALL_OUTPUT%"
+          %RUNNER_TOOL_CACHE%\gh\2.34.0\x64\bin\gh --version

@@ -10,5 +10,5 @@ outputs:
   gh_version:
     description: "The installed version"
 runs:
-  using: "node16"
+  using: "node20"
   main: "lib/index.js"
